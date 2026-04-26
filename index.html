@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dublaj Studio Pro 🎬</title>
+<title>Dublaj Studio Pro 🎬 - Web Tabanlı AI Dublaj</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -16,11 +16,12 @@
       <span class="logo-icon">🎬</span>
       <div>
         <h1>Dublaj Studio</h1>
-        <span class="subtitle">AI ile Seslendirme</span>
+        <span class="subtitle">AI ile Seslendirme · Web Tabanlı</span>
       </div>
     </div>
     <div class="header-info">
       <span class="badge badge-api" id="apiStatus">🔴 API Bağlı Değil</span>
+      <span class="badge badge-version">v2.0</span>
     </div>
   </header>
 
@@ -33,10 +34,10 @@
       </div>
       <div class="card-body">
         <div class="settings-grid">
-          <div class="setting-group">
+          <div class="setting-group full-width">
             <label>🔑 ElevenLabs API Key</label>
             <input type="password" id="apiKey" placeholder="sk_..." value="sk_5fbe34c76bd3e993d620ba42f3dbff9aaf2a4cf81bbc81cc">
-            <span class="hint">ElevenLabs hesabından alın</span>
+            <span class="hint">ElevenLabs hesabından alın · <a href="https://elevenlabs.io" target="_blank" style="color:#6c5ce7;">elevenlabs.io</a></span>
           </div>
           <div class="setting-group">
             <label>🎤 Ses Seç</label>
@@ -45,26 +46,37 @@
               <option value="21m00Tcm4TlvDq8ikWAM">Adam (İngilizce)</option>
               <option value="AZnzlk1XvdvUeBnXmlld">Bella (İngilizce)</option>
               <option value="EXAVITQu4vr2SDak6K">Antoni (İngilizce)</option>
+              <option value="IKne3meq5aSn9XLyUdCD">Çınar (Türkçe)</option>
             </select>
           </div>
           <div class="setting-group">
             <label>🌐 Kaynak Dil</label>
             <select id="sourceLang">
-              <option value="tr">Türkçe</option>
-              <option value="en">İngilizce</option>
-              <option value="de">Almanca</option>
-              <option value="fr">Fransızca</option>
-              <option value="es">İspanyolca</option>
+              <option value="tr">🇹🇷 Türkçe</option>
+              <option value="en">🇬🇧 İngilizce</option>
+              <option value="de">🇩🇪 Almanca</option>
+              <option value="fr">🇫🇷 Fransızca</option>
+              <option value="es">🇪🇸 İspanyolca</option>
+              <option value="it">🇮🇹 İtalyanca</option>
+              <option value="pt">🇵🇹 Portekizce</option>
+              <option value="ru">🇷🇺 Rusça</option>
+              <option value="ja">🇯🇵 Japonca</option>
+              <option value="ko">🇰🇷 Korece</option>
             </select>
           </div>
           <div class="setting-group">
             <label>🌐 Hedef Dil</label>
             <select id="targetLang">
-              <option value="en">İngilizce</option>
-              <option value="tr" selected>Türkçe</option>
-              <option value="de">Almanca</option>
-              <option value="fr">Fransızca</option>
-              <option value="es">İspanyolca</option>
+              <option value="en">🇬🇧 İngilizce</option>
+              <option value="tr" selected>🇹🇷 Türkçe</option>
+              <option value="de">🇩🇪 Almanca</option>
+              <option value="fr">🇫🇷 Fransızca</option>
+              <option value="es">🇪🇸 İspanyolca</option>
+              <option value="it">🇮🇹 İtalyanca</option>
+              <option value="pt">🇵🇹 Portekizce</option>
+              <option value="ru">🇷🇺 Rusça</option>
+              <option value="ja">🇯🇵 Japonca</option>
+              <option value="ko">🇰🇷 Korece</option>
             </select>
           </div>
         </div>
@@ -73,7 +85,7 @@
           <div class="upload-content">
             <span class="upload-icon">📁</span>
             <p><strong>Video dosyasını sürükle bırak</strong></p>
-            <p class="upload-hint">veya tıkla seç (MP4, AVI, MOV)</p>
+            <p class="upload-hint">veya tıkla seç (MP4, AVI, MOV, WebM)</p>
             <input type="file" id="fileInput" accept="video/*" hidden>
           </div>
         </div>
@@ -90,6 +102,14 @@
         <button class="btn btn-primary btn-full" id="startBtn" disabled>
           <span>🎬 Dublajı Başlat</span>
         </button>
+
+        <div class="info-box">
+          <span class="info-icon">ℹ️</span>
+          <span class="info-text">
+            <strong>Termux bağlantısı yok!</strong> Tüm işlemler tarayıcında (Web Audio API + ElevenLabs API) çalışır. 
+            Hiçbir dosya sunucuya gönderilmez, her şey yerelde işlenir.
+          </span>
+        </div>
       </div>
     </section>
 
@@ -129,6 +149,10 @@
         <div class="progress-bar">
           <div class="progress-fill" id="progressFill"></div>
         </div>
+        <div class="progress-info">
+          <span id="progressText">Başlatılıyor...</span>
+          <span id="progressPercent">0%</span>
+        </div>
         <div class="progress-log" id="progressLog">
           <div class="log-entry log-info">⏳ Hazır...</div>
         </div>
@@ -142,22 +166,34 @@
       </div>
       <div class="card-body">
         <div class="result-player">
+          <p class="result-label">🎬 Orijinal Video</p>
           <video id="resultVideo" controls width="100%"></video>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="downloadBtn">⬇️ Dublaj Sesini İndir (WAV)</button>
+            <button class="btn btn-secondary" id="copyBtn">📋 Link Kopyala</button>
+          </div>
         </div>
-        <div class="result-actions">
-          <button class="btn btn-primary" id="downloadBtn">⬇️ Dublaj Sesini İndir</button>
-          <button class="btn btn-secondary" id="resetBtn">🔄 Yeni Dublaj</button>
+
+        <div class="result-summary" id="resultSummary">
+          <div class="summary-item"><span>🎤</span> <span id="rSegCount">0</span> Segment</div>
+          <div class="summary-item"><span>⏱</span> <span id="rDuration">0:00</span></div>
+          <div class="summary-item"><span>🌐</span> <span id="rLangs">tr → en</span></div>
         </div>
+
         <div class="segment-list" id="segmentList">
           <h3>📋 Segmentler</h3>
           <div id="segmentsContainer"></div>
         </div>
+
+        <button class="btn btn-secondary btn-full" id="resetBtn" style="margin-top:12px;">
+          🔄 Yeni Dublaj
+        </button>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>🚀 AI Dublaj Studio · ElevenLabs API ile güçlendirilmiştir</p>
+    <p>🚀 AI Dublaj Studio · ElevenLabs API + MyMemory Translate · <strong>%100 web tabanlı</strong></p>
   </footer>
 </div>
 
