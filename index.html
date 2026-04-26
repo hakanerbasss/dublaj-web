@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dublaj Studio Pro 🎬</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🎬</span>
+      <div>
+        <h1>Dublaj Studio</h1>
+        <span class="subtitle">AI ile Seslendirme</span>
+      </div>
+    </div>
+    <div class="header-info">
+      <span class="badge badge-api" id="apiStatus">🔴 API Bağlı Değil</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Step 1: Upload & Settings -->
+    <section class="card upload-section" id="uploadSection">
+      <div class="card-header">
+        <h2><span class="step-num">1</span> Video Yükle & Ayarlar</h2>
+      </div>
+      <div class="card-body">
+        <div class="settings-grid">
+          <div class="setting-group">
+            <label>🔑 ElevenLabs API Key</label>
+            <input type="password" id="apiKey" placeholder="sk_..." value="sk_5fbe34c76bd3e993d620ba42f3dbff9aaf2a4cf81bbc81cc">
+            <span class="hint">ElevenLabs hesabından alın</span>
+          </div>
+          <div class="setting-group">
+            <label>🎤 Ses Seç</label>
+            <select id="voiceSelect">
+              <option value="JBFqnCBsd6RMkjVDRZzb">Rachel (İngilizce)</option>
+              <option value="21m00Tcm4TlvDq8ikWAM">Adam (İngilizce)</option>
+              <option value="AZnzlk1XvdvUeBnXmlld">Bella (İngilizce)</option>
+              <option value="EXAVITQu4vr2SDak6K">Antoni (İngilizce)</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>🌐 Kaynak Dil</label>
+            <select id="sourceLang">
+              <option value="tr">Türkçe</option>
+              <option value="en">İngilizce</option>
+              <option value="de">Almanca</option>
+              <option value="fr">Fransızca</option>
+              <option value="es">İspanyolca</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>🌐 Hedef Dil</label>
+            <select id="targetLang">
+              <option value="en">İngilizce</option>
+              <option value="tr" selected>Türkçe</option>
+              <option value="de">Almanca</option>
+              <option value="fr">Fransızca</option>
+              <option value="es">İspanyolca</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-content">
+            <span class="upload-icon">📁</span>
+            <p><strong>Video dosyasını sürükle bırak</strong></p>
+            <p class="upload-hint">veya tıkla seç (MP4, AVI, MOV)</p>
+            <input type="file" id="fileInput" accept="video/*" hidden>
+          </div>
+        </div>
+
+        <div class="video-preview" id="videoPreview" style="display:none">
+          <video id="previewVideo" controls width="100%"></video>
+          <div class="video-info">
+            <span id="videoName">-</span>
+            <span id="videoDuration">-</span>
+            <span id="videoSize">-</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="startBtn" disabled>
+          <span>🎬 Dublajı Başlat</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Step 2: Progress -->
+    <section class="card progress-section" id="progressSection" style="display:none">
+      <div class="card-header">
+        <h2><span class="step-num">2</span> Dublaj İşleniyor</h2>
+      </div>
+      <div class="card-body">
+        <div class="progress-steps">
+          <div class="progress-step" id="stepAudio">
+            <span class="step-icon">🎵</span>
+            <span>Ses Ayrıştırma</span>
+            <span class="step-status" id="statusAudio">⏳</span>
+          </div>
+          <div class="progress-step" id="stepSTT">
+            <span class="step-icon">📝</span>
+            <span>Konuşma Tanıma (STT)</span>
+            <span class="step-status" id="statusSTT">⏳</span>
+          </div>
+          <div class="progress-step" id="stepTranslate">
+            <span class="step-icon">🌐</span>
+            <span>Çeviri</span>
+            <span class="step-status" id="statusTranslate">⏳</span>
+          </div>
+          <div class="progress-step" id="stepTTS">
+            <span class="step-icon">🎤</span>
+            <span>Seslendirme (TTS)</span>
+            <span class="step-status" id="statusTTS">⏳</span>
+          </div>
+          <div class="progress-step" id="stepMerge">
+            <span class="step-icon">🎬</span>
+            <span>Ses Birleştirme</span>
+            <span class="step-status" id="statusMerge">⏳</span>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-log" id="progressLog">
+          <div class="log-entry log-info">⏳ Hazır...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Result -->
+    <section class="card result-section" id="resultSection" style="display:none">
+      <div class="card-header">
+        <h2><span class="step-num">3</span> Sonuç</h2>
+      </div>
+      <div class="card-body">
+        <div class="result-player">
+          <video id="resultVideo" controls width="100%"></video>
+        </div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="downloadBtn">⬇️ Dublaj Sesini İndir</button>
+          <button class="btn btn-secondary" id="resetBtn">🔄 Yeni Dublaj</button>
+        </div>
+        <div class="segment-list" id="segmentList">
+          <h3>📋 Segmentler</h3>
+          <div id="segmentsContainer"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>🚀 AI Dublaj Studio · ElevenLabs API ile güçlendirilmiştir</p>
+  </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
